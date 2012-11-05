@@ -1497,6 +1497,7 @@ static VALUE socket_send (int argc_, VALUE* argv_, VALUE self_)
 
     zmq_msg_t msg;
     int rc = zmq_msg_init_size (&msg, RSTRING_LEN (msg_));
+    int loop_count = 0; //security for retries in case of EINTR
     if (rc != 0) {
         rb_raise (exception_type, "%s", zmq_strerror (zmq_errno ()));
         return Qnil;
@@ -1514,7 +1515,6 @@ static VALUE socket_send (int argc_, VALUE* argv_, VALUE self_)
     }
     else
 #endif
-     int loop_count = 0;
       do {
           loop_count++;
           if (loop_count>5)
